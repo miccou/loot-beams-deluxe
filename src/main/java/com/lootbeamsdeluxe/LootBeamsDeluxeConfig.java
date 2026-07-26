@@ -1,0 +1,688 @@
+/*
+ * Copyright (c) 2026, Michael Cousins <https://github.com/miccou>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.lootbeamsdeluxe;
+
+import java.awt.Color;
+import net.runelite.client.config.Alpha;
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.Units;
+
+@ConfigGroup(LootBeamsDeluxeConfig.GROUP)
+public interface LootBeamsDeluxeConfig extends Config
+{
+	String GROUP = "lootbeamsdeluxe";
+
+	@ConfigItem(
+		keyName = "priceMode",
+		name = "Price mode",
+		description = "Which value decides an item's tier: Grand Exchange price, High Alchemy value, or whichever is higher.",
+		position = 0
+	)
+	default ValueMode priceMode()
+	{
+		return ValueMode.HIGHEST;
+	}
+
+	@ConfigItem(
+		keyName = "defaultStyle",
+		name = "Default style",
+		description = "Beam style used by tiers set to 'Same as default'.",
+		position = 1
+	)
+	default BeamStyle defaultStyle()
+	{
+		return BeamStyle.MODERN;
+	}
+
+	@ConfigItem(
+		keyName = "syncGroundItems",
+		name = "Use Ground Items lists",
+		description = "Reuse the highlighted and hidden item lists from the Ground Items plugin, so you only manage one set of lists.",
+		position = 2
+	)
+	default boolean syncGroundItems()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "additionalHighlights",
+		name = "Also highlight",
+		description = "Extra items that always get the highlight beam (comma separated, supports * wildcards and name>quantity).",
+		position = 3
+	)
+	default String additionalHighlights()
+	{
+		return "";
+	}
+
+	@ConfigItem(
+		keyName = "fanfareMode",
+		name = "Play fanfare",
+		description = "Play the fanfare on the tile the moment qualifying loot drops, before the beam starts.",
+		position = 4
+	)
+	default FanfareMode fanfareMode()
+	{
+		return FanfareMode.OFF;
+	}
+
+	@ConfigItem(
+		keyName = "fanfareStyle",
+		name = "Fanfare style",
+		description = "The entrance effect to play: the ToA Wardens lightning sequence, a column that rises from the ground and sinks back, the Combat Achievements trophy teleport, or Drakan's incinerate fireball.",
+		position = 5
+	)
+	default FanfareStyle fanfareStyle()
+	{
+		return FanfareStyle.LIGHTNING;
+	}
+
+	@ConfigItem(
+		keyName = "fanfareColor",
+		name = "Fanfare colors",
+		description = "Match the beam colors of the loot's tier (so each tier gets its own fanfare), or pick two custom colors below.",
+		position = 6
+	)
+	default FanfareColor fanfareColor()
+	{
+		return FanfareColor.MATCH_BEAM;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "fanfareColor1",
+		name = "Custom color 1",
+		description = "Main fanfare color (the strike) when 'Custom' is selected.",
+		position = 7
+	)
+	default Color fanfareColor1()
+	{
+		return new Color(0xF12E2E);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "fanfareColor2",
+		name = "Custom color 2",
+		description = "Accent fanfare color (the warning flash or the effect's secondary detail) when 'Custom' is selected.",
+		position = 8
+	)
+	default Color fanfareColor2()
+	{
+		return new Color(0xFFCC33);
+	}
+
+	// -- Highlighted items ---------------------------------------------------
+
+	@ConfigSection(
+		name = "Highlighted items",
+		description = "Beam settings for explicitly highlighted items.",
+		position = 9,
+		closedByDefault = true
+	)
+	String highlightedSection = "highlightedSection";
+
+	@ConfigItem(
+		keyName = "showHighlightBeam",
+		name = "Show beam",
+		description = "Show a beam for items on your highlight lists, regardless of value.",
+		position = 0,
+		section = highlightedSection
+	)
+	default boolean showHighlightBeam()
+	{
+		return true;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "highlightBeamColor",
+		name = "Beam color",
+		description = "Main beam color for highlighted items.",
+		position = 1,
+		section = highlightedSection
+	)
+	default Color highlightBeamColor()
+	{
+		return new Color(0xAA00FF);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "highlightSecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = highlightedSection
+	)
+	default Color highlightSecondaryColor()
+	{
+		return new Color(0xCC66FF);
+	}
+
+	@ConfigItem(
+		keyName = "highlightStyle",
+		name = "Style",
+		description = "Beam style for highlighted items.",
+		position = 3,
+		section = highlightedSection
+	)
+	default StyleOverride highlightStyle()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 1 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 1 (lowest)",
+		description = "Threshold, colors, and style for this tier.",
+		position = 10,
+		closedByDefault = true
+	)
+	String tier1Section = "tier1Section";
+
+	@ConfigItem(
+		keyName = "tier1Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier1Section
+	)
+	@Units(" gp")
+	default int tier1Value()
+	{
+		return 20_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier1BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier1Section
+	)
+	default Color tier1BeamColor()
+	{
+		return new Color(0x66B2FF);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier1SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier1Section
+	)
+	default Color tier1SecondaryColor()
+	{
+		return new Color(0x99CCFF);
+	}
+
+	@ConfigItem(
+		keyName = "tier1Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier1Section
+	)
+	default StyleOverride tier1Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 2 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 2",
+		description = "Threshold, colors, and style for this tier.",
+		position = 11,
+		closedByDefault = true
+	)
+	String tier2Section = "tier2Section";
+
+	@ConfigItem(
+		keyName = "tier2Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier2Section
+	)
+	@Units(" gp")
+	default int tier2Value()
+	{
+		return 100_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier2BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier2Section
+	)
+	default Color tier2BeamColor()
+	{
+		return new Color(0x99FF99);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier2SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier2Section
+	)
+	default Color tier2SecondaryColor()
+	{
+		return new Color(0xCCFFCC);
+	}
+
+	@ConfigItem(
+		keyName = "tier2Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier2Section
+	)
+	default StyleOverride tier2Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 3 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 3",
+		description = "Threshold, colors, and style for this tier.",
+		position = 12,
+		closedByDefault = true
+	)
+	String tier3Section = "tier3Section";
+
+	@ConfigItem(
+		keyName = "tier3Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier3Section
+	)
+	@Units(" gp")
+	default int tier3Value()
+	{
+		return 500_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier3BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier3Section
+	)
+	default Color tier3BeamColor()
+	{
+		return new Color(0x00E5D0);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier3SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier3Section
+	)
+	default Color tier3SecondaryColor()
+	{
+		return new Color(0x66FFF0);
+	}
+
+	@ConfigItem(
+		keyName = "tier3Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier3Section
+	)
+	default StyleOverride tier3Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 4 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 4",
+		description = "Threshold, colors, and style for this tier.",
+		position = 13,
+		closedByDefault = true
+	)
+	String tier4Section = "tier4Section";
+
+	@ConfigItem(
+		keyName = "tier4Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier4Section
+	)
+	@Units(" gp")
+	default int tier4Value()
+	{
+		return 1_000_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier4BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier4Section
+	)
+	default Color tier4BeamColor()
+	{
+		return new Color(0xFFB000);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier4SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier4Section
+	)
+	default Color tier4SecondaryColor()
+	{
+		return new Color(0xFFD066);
+	}
+
+	@ConfigItem(
+		keyName = "tier4Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier4Section
+	)
+	default StyleOverride tier4Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 5 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 5",
+		description = "Threshold, colors, and style for this tier.",
+		position = 14,
+		closedByDefault = true
+	)
+	String tier5Section = "tier5Section";
+
+	@ConfigItem(
+		keyName = "tier5Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier5Section
+	)
+	@Units(" gp")
+	default int tier5Value()
+	{
+		return 5_000_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier5BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier5Section
+	)
+	default Color tier5BeamColor()
+	{
+		return new Color(0xFF6040);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier5SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier5Section
+	)
+	default Color tier5SecondaryColor()
+	{
+		return new Color(0xFF9980);
+	}
+
+	@ConfigItem(
+		keyName = "tier5Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier5Section
+	)
+	default StyleOverride tier5Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 6 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 6",
+		description = "Threshold, colors, and style for this tier.",
+		position = 15,
+		closedByDefault = true
+	)
+	String tier6Section = "tier6Section";
+
+	@ConfigItem(
+		keyName = "tier6Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier6Section
+	)
+	@Units(" gp")
+	default int tier6Value()
+	{
+		return 10_000_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier6BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier6Section
+	)
+	default Color tier6BeamColor()
+	{
+		return new Color(0xFF66E0);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier6SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier6Section
+	)
+	default Color tier6SecondaryColor()
+	{
+		return new Color(0xFF99EC);
+	}
+
+	@ConfigItem(
+		keyName = "tier6Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier6Section
+	)
+	default StyleOverride tier6Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 7 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 7",
+		description = "Threshold, colors, and style for this tier.",
+		position = 16,
+		closedByDefault = true
+	)
+	String tier7Section = "tier7Section";
+
+	@ConfigItem(
+		keyName = "tier7Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier7Section
+	)
+	@Units(" gp")
+	default int tier7Value()
+	{
+		return 50_000_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier7BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier7Section
+	)
+	default Color tier7BeamColor()
+	{
+		return new Color(0xB266FF);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier7SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier7Section
+	)
+	default Color tier7SecondaryColor()
+	{
+		return new Color(0xD1A6FF);
+	}
+
+	@ConfigItem(
+		keyName = "tier7Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier7Section
+	)
+	default StyleOverride tier7Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+
+	// -- Tier 8 ---------------------------------------------------------------
+
+	@ConfigSection(
+		name = "Tier 8 (highest)",
+		description = "Threshold, colors, and style for this tier.",
+		position = 17,
+		closedByDefault = true
+	)
+	String tier8Section = "tier8Section";
+
+	@ConfigItem(
+		keyName = "tier8Value",
+		name = "Value",
+		description = "Minimum total stack value for this tier. 0 disables the tier.",
+		position = 0,
+		section = tier8Section
+	)
+	@Units(" gp")
+	default int tier8Value()
+	{
+		return 100_000_000;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier8BeamColor",
+		name = "Beam color",
+		description = "Main beam color for this tier.",
+		position = 1,
+		section = tier8Section
+	)
+	default Color tier8BeamColor()
+	{
+		return new Color(0xF5F5F5);
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "tier8SecondaryColor",
+		name = "Secondary color",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		position = 2,
+		section = tier8Section
+	)
+	default Color tier8SecondaryColor()
+	{
+		return new Color(0xFFF0B0);
+	}
+
+	@ConfigItem(
+		keyName = "tier8Style",
+		name = "Style",
+		description = "Beam style for this tier.",
+		position = 3,
+		section = tier8Section
+	)
+	default StyleOverride tier8Style()
+	{
+		return StyleOverride.DEFAULT;
+	}
+}

@@ -99,6 +99,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 	protected void startUp()
 	{
 		beamManager = new BeamManager(client, clientThread);
+		tierResolver = TierResolver.fromConfig(config);
 		suppressFanfareUntilTick = client.getTickCount() + 1;
 		clientThread.invoke(this::rebuild);
 	}

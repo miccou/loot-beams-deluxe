@@ -43,6 +43,7 @@ import net.runelite.api.events.ItemQuantityChanged;
 import net.runelite.api.events.ItemSpawned;
 import net.runelite.api.events.WorldViewUnloaded;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -64,6 +65,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 	private static final String GROUND_ITEMS_GROUP = "grounditems";
 	private static final String GROUND_ITEMS_HIGHLIGHTED_KEY = "highlightedItems";
 	private static final String GROUND_ITEMS_HIDDEN_KEY = "hiddenItems";
+	private static final String GROUND_ITEMS_OWNERSHIP_KEY = "ownershipFilterMode";
 
 	@Inject
 	private Client client;
@@ -99,7 +101,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 	protected void startUp()
 	{
 		beamManager = new BeamManager(client, clientThread);
-		tierResolver = TierResolver.fromConfig(config);
+		tierResolver = TierResolver.fromConfig(config, ownershipFilter());
 		suppressFanfareUntilTick = client.getTickCount() + 1;
 		clientThread.invoke(this::rebuild);
 	}
@@ -203,7 +205,11 @@ public class LootBeamsDeluxePlugin extends Plugin
 			&& GROUND_ITEMS_GROUP.equals(event.getGroup())
 			&& (GROUND_ITEMS_HIGHLIGHTED_KEY.equals(event.getKey()) || GROUND_ITEMS_HIDDEN_KEY.equals(event.getKey()));
 
-		if (ownGroup || syncedGroundItemsList)
+		boolean syncedOwnership = config.ownershipFilter() == OwnershipFilter.SYNC
+			&& GROUND_ITEMS_GROUP.equals(event.getGroup())
+			&& GROUND_ITEMS_OWNERSHIP_KEY.equals(event.getKey());
+
+		if (ownGroup || syncedGroundItemsList || syncedOwnership)
 		{
 			clientThread.invokeLater(this::rebuild);
 		}
@@ -222,7 +228,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 			configManager.getConfiguration(GROUND_ITEMS_GROUP, GROUND_ITEMS_HIDDEN_KEY),
 			config.additionalHighlights(),
 			config.syncGroundItems());
-		tierResolver = TierResolver.fromConfig(config);
+		tierResolver = TierResolver.fromConfig(config, ownershipFilter());
 
 		for (WorldPoint worldPoint : trackedItems.rowKeySet())
 		{
@@ -230,9 +236,18 @@ public class LootBeamsDeluxePlugin extends Plugin
 		}
 	}
 
+	private OwnershipFilter ownershipFilter()
+	{
+		OwnershipFilter configured = config.ownershipFilter();
+		return configured == OwnershipFilter.SYNC
+			? OwnershipFilter.fromGroundItems(configManager.getConfiguration(GROUND_ITEMS_GROUP, GROUND_ITEMS_OWNERSHIP_KEY))
+			: configured;
+	}
+
 	private void handleTile(WorldPoint worldPoint, boolean isNewSpawn)
 	{
-		Resolution resolution = tierResolver.resolve(trackedItems.row(worldPoint).values(), listSync);
+		Resolution resolution = tierResolver.resolve(trackedItems.row(worldPoint).values(), listSync,
+			client.getVarbitValue(VarbitID.IRONMAN));
 		boolean playFanfare = isNewSpawn
 			&& client.getTickCount() > suppressFanfareUntilTick
 			&& config.fanfareMode().qualifies(resolution);
@@ -275,6 +290,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 			.gePrice(gePrice)
 			.haPrice(haPrice)
 			.worldViewId(itemLayer.getWorldView().getId())
+			.ownership(item.getOwnership())
 			.build();
 	}
 }

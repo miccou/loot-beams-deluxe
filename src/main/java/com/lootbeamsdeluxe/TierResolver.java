@@ -46,10 +46,11 @@ class TierResolver
 
 	private final List<TierDef> tiersDescending;
 	private final ValueMode valueMode;
+	private final OwnershipFilter ownershipFilter;
 	private final boolean showHighlightBeam;
 	private final Resolution highlightResolution;
 
-	TierResolver(List<TierDef> tiers, ValueMode valueMode,
+	TierResolver(List<TierDef> tiers, ValueMode valueMode, OwnershipFilter ownershipFilter,
 		boolean showHighlightBeam, Color highlightPrimary, Color highlightSecondary, BeamStyle highlightStyle)
 	{
 		List<TierDef> sorted = new ArrayList<>();
@@ -63,12 +64,13 @@ class TierResolver
 		sorted.sort(Comparator.comparingInt(TierDef::getThreshold).reversed());
 		this.tiersDescending = sorted;
 		this.valueMode = valueMode;
+		this.ownershipFilter = ownershipFilter;
 		this.showHighlightBeam = showHighlightBeam;
 		this.highlightResolution = new Resolution(Resolution.Kind.HIGHLIGHTED, 0,
 			highlightPrimary, highlightSecondary, highlightStyle);
 	}
 
-	static TierResolver fromConfig(LootBeamsDeluxeConfig config)
+	static TierResolver fromConfig(LootBeamsDeluxeConfig config, OwnershipFilter ownershipFilter)
 	{
 		BeamStyle defaultStyle = config.defaultStyle();
 		List<TierDef> tiers = List.of(
@@ -81,19 +83,25 @@ class TierResolver
 			new TierDef(7, config.tier7Value(), config.tier7BeamColor(), config.tier7SecondaryColor(), config.tier7Style().resolve(defaultStyle)),
 			new TierDef(8, config.tier8Value(), config.tier8BeamColor(), config.tier8SecondaryColor(), config.tier8Style().resolve(defaultStyle)));
 
-		return new TierResolver(tiers, config.priceMode(), config.showHighlightBeam(),
+		return new TierResolver(tiers, config.priceMode(), ownershipFilter, config.showHighlightBeam(),
 			config.highlightBeamColor(), config.highlightSecondaryColor(),
 			config.highlightStyle().resolve(defaultStyle));
 	}
 
-	// highlighted wins outright, hidden is skipped, otherwise the priciest
-	// stack on the tile picks the tier
-	Resolution resolve(Collection<TrackedItem> items, ItemListSync lists)
+	// filtered-out items are skipped, highlighted wins outright, hidden is
+	// skipped, otherwise the priciest stack on the tile picks the tier.
+	// accountType is the IRONMAN varbit
+	Resolution resolve(Collection<TrackedItem> items, ItemListSync lists, int accountType)
 	{
 		long highestValue = -1;
 
 		for (TrackedItem item : items)
 		{
+			if (!ownershipFilter.shouldCount(item.getOwnership(), accountType))
+			{
+				continue;
+			}
+
 			int hiddenOrHighlighted = lists.hiddenOrHighlighted(item.getName(), item.getQuantity());
 			if (hiddenOrHighlighted == ItemListSync.HIGHLIGHTED && showHighlightBeam)
 			{

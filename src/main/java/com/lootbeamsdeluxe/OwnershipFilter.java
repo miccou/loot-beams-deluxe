@@ -24,27 +24,64 @@
  */
 package com.lootbeamsdeluxe;
 
-import lombok.Data;
-import lombok.Builder;
+import javax.annotation.Nullable;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import net.runelite.api.TileItem;
 
 /**
- * One stack on a tile. Prices are per unit; quantity merges across identical
- * spawns on the same tile, same as Ground Items does it.
+ * Which items on a tile count towards its beam. 
+ * Names match Ground Items OwnershipFilterMode so SYNC can resolve its setting by name.
  */
-@Data
-@Builder
-class TrackedItem
+@Getter
+@RequiredArgsConstructor
+public enum OwnershipFilter
 {
-	private final int itemId;
-	private final String name;
-	private final int gePrice;
-	private final int haPrice;
-	private final int worldViewId;
-	private final int ownership;
-	private int quantity;
+	SYNC("Ground Items"),
+	ALL("All"),
+	TAKEABLE("Takeable"),
+	DROPS("Drops"),
+	;
 
-	long stackValue(ValueMode mode)
+	private final String displayName;
+
+	// unset/unknown falls back to ALL
+	static OwnershipFilter fromGroundItems(@Nullable String configValue)
 	{
-		return (long) mode.unitValue(gePrice, haPrice) * quantity;
+		if (configValue != null)
+		{
+			String trimmed = configValue.trim();
+			for (OwnershipFilter filter : values())
+			{
+				if (filter != SYNC && filter.name().equalsIgnoreCase(trimmed))
+				{
+					return filter;
+				}
+			}
+		}
+
+		return ALL;
+	}
+
+	// All      -> none | self | other | group
+	// Drops    -> self | group
+	// Takeable -> none | self | group | (if a main then other)
+	boolean shouldCount(int ownership, int accountType)
+	{
+		switch (this)
+		{
+			case DROPS:
+				return ownership == TileItem.OWNERSHIP_SELF || ownership == TileItem.OWNERSHIP_GROUP;
+			case TAKEABLE:
+				return ownership != TileItem.OWNERSHIP_OTHER || accountType == 0; // mains can always take items
+			default:
+				return true;
+		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return displayName;
 	}
 }

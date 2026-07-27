@@ -71,10 +71,22 @@ public interface LootBeamsDeluxeConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "ownershipFilter",
+		name = "Ownership filter",
+		description = "Which items on a tile count towards its beam. 'Drops' is yours and your group's only, "
+			+ "'Takeable' also hides what an ironman can't pick up. Follows Ground Items' own setting by default.",
+		position = 3
+	)
+	default OwnershipFilter ownershipFilter()
+	{
+		return OwnershipFilter.SYNC;
+	}
+
+	@ConfigItem(
 		keyName = "additionalHighlights",
 		name = "Also highlight",
 		description = "Extra items that always get the highlight beam (comma separated, supports * wildcards and name>quantity).",
-		position = 3
+		position = 4
 	)
 	default String additionalHighlights()
 	{
@@ -85,7 +97,7 @@ public interface LootBeamsDeluxeConfig extends Config
 		keyName = "fanfareMode",
 		name = "Play fanfare",
 		description = "Play the fanfare on the tile the moment qualifying loot drops, before the beam starts.",
-		position = 4
+		position = 5
 	)
 	default FanfareMode fanfareMode()
 	{
@@ -96,7 +108,7 @@ public interface LootBeamsDeluxeConfig extends Config
 		keyName = "fanfareStyle",
 		name = "Fanfare style",
 		description = "The entrance effect to play: the ToA Wardens lightning sequence, a column that rises from the ground and sinks back, the Combat Achievements trophy teleport, or Drakan's incinerate fireball.",
-		position = 5
+		position = 6
 	)
 	default FanfareStyle fanfareStyle()
 	{
@@ -107,7 +119,7 @@ public interface LootBeamsDeluxeConfig extends Config
 		keyName = "fanfareColor",
 		name = "Fanfare colors",
 		description = "Match the beam colors of the loot's tier (so each tier gets its own fanfare), or pick two custom colors below.",
-		position = 6
+		position = 7
 	)
 	default FanfareColor fanfareColor()
 	{
@@ -119,7 +131,7 @@ public interface LootBeamsDeluxeConfig extends Config
 		keyName = "fanfareColor1",
 		name = "Custom color 1",
 		description = "Main fanfare color (the strike) when 'Custom' is selected.",
-		position = 7
+		position = 8
 	)
 	default Color fanfareColor1()
 	{
@@ -131,7 +143,7 @@ public interface LootBeamsDeluxeConfig extends Config
 		keyName = "fanfareColor2",
 		name = "Custom color 2",
 		description = "Accent fanfare color (the warning flash or the effect's secondary detail) when 'Custom' is selected.",
-		position = 8
+		position = 9
 	)
 	default Color fanfareColor2()
 	{
@@ -143,7 +155,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Highlighted items",
 		description = "Beam settings for explicitly highlighted items.",
-		position = 9,
+		position = 10,
 		closedByDefault = true
 	)
 	String highlightedSection = "highlightedSection";
@@ -203,7 +215,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 1 (lowest)",
 		description = "Threshold, colors, and style for this tier.",
-		position = 10,
+		position = 11,
 		closedByDefault = true
 	)
 	String tier1Section = "tier1Section";
@@ -264,7 +276,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 2",
 		description = "Threshold, colors, and style for this tier.",
-		position = 11,
+		position = 12,
 		closedByDefault = true
 	)
 	String tier2Section = "tier2Section";
@@ -325,7 +337,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 3",
 		description = "Threshold, colors, and style for this tier.",
-		position = 12,
+		position = 13,
 		closedByDefault = true
 	)
 	String tier3Section = "tier3Section";
@@ -386,7 +398,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 4",
 		description = "Threshold, colors, and style for this tier.",
-		position = 13,
+		position = 14,
 		closedByDefault = true
 	)
 	String tier4Section = "tier4Section";
@@ -447,7 +459,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 5",
 		description = "Threshold, colors, and style for this tier.",
-		position = 14,
+		position = 15,
 		closedByDefault = true
 	)
 	String tier5Section = "tier5Section";
@@ -508,7 +520,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 6",
 		description = "Threshold, colors, and style for this tier.",
-		position = 15,
+		position = 16,
 		closedByDefault = true
 	)
 	String tier6Section = "tier6Section";
@@ -569,7 +581,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 7",
 		description = "Threshold, colors, and style for this tier.",
-		position = 16,
+		position = 17,
 		closedByDefault = true
 	)
 	String tier7Section = "tier7Section";
@@ -630,7 +642,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigSection(
 		name = "Tier 8 (highest)",
 		description = "Threshold, colors, and style for this tier.",
-		position = 17,
+		position = 18,
 		closedByDefault = true
 	)
 	String tier8Section = "tier8Section";

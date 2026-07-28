@@ -1,5 +1,8 @@
 # Loot Beams Deluxe
 
+![GitHub last commit](https://img.shields.io/github/last-commit/miccou/loot-beams-deluxe)
+![Active Installs](https://img.shields.io/endpoint?url=https://api.runelite.net/pluginhub/shields/installs/plugin/loot-beams-deluxe)
+
 Ever wish your lootbeams had a bit more style and customization?
 
 ![Loot Beams Deluxe in action](demo.gif)

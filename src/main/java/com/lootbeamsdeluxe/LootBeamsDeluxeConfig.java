@@ -30,6 +30,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.Range;
 import net.runelite.client.config.Units;
 
 @ConfigGroup(LootBeamsDeluxeConfig.GROUP)
@@ -696,5 +697,149 @@ public interface LootBeamsDeluxeConfig extends Config
 	default StyleOverride tier8Style()
 	{
 		return StyleOverride.DEFAULT;
+	}
+
+	// -- Preview beams ---------------------------------------------------------
+
+	@ConfigSection(
+		name = "Preview beams",
+		description = "Put a beam on a tile next to you to preview a tier without waiting for a drop.",
+		position = 19,
+		closedByDefault = true
+	)
+	String previewSection = "previewSection";
+
+	@ConfigItem(
+		keyName = "previewDirection",
+		name = "Direction",
+		description = "Which way from you the preview tile sits.",
+		position = 0,
+		section = previewSection
+	)
+	default PreviewDirection previewDirection()
+	{
+		return PreviewDirection.NORTH;
+	}
+
+	@ConfigItem(
+		keyName = "previewDistance",
+		name = "Distance",
+		description = "How far from you the preview tile sits.",
+		position = 1,
+		section = previewSection
+	)
+	@Units(" tiles")
+	@Range(min = 1, max = 25)
+	default int previewDistance()
+	{
+		return 2;
+	}
+
+	@ConfigItem(
+		keyName = "previewHighlight",
+		name = "Highlight",
+		description = "Show the highlight beam on the preview tile. Untick to remove it. Wins over any ticked tier.",
+		position = 2,
+		section = previewSection
+	)
+	default boolean previewHighlight()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier1",
+		name = "Tier 1",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 3,
+		section = previewSection
+	)
+	default boolean previewTier1()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier2",
+		name = "Tier 2",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 4,
+		section = previewSection
+	)
+	default boolean previewTier2()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier3",
+		name = "Tier 3",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 5,
+		section = previewSection
+	)
+	default boolean previewTier3()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier4",
+		name = "Tier 4",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 6,
+		section = previewSection
+	)
+	default boolean previewTier4()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier5",
+		name = "Tier 5",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 7,
+		section = previewSection
+	)
+	default boolean previewTier5()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier6",
+		name = "Tier 6",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 8,
+		section = previewSection
+	)
+	default boolean previewTier6()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier7",
+		name = "Tier 7",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 9,
+		section = previewSection
+	)
+	default boolean previewTier7()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "previewTier8",
+		name = "Tier 8",
+		description = "Show this tier's beam on the preview tile. Untick to remove it.",
+		position = 10,
+		section = previewSection
+	)
+	default boolean previewTier8()
+	{
+		return false;
 	}
 }

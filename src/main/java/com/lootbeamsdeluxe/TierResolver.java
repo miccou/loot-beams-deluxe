@@ -44,6 +44,7 @@ class TierResolver
 		BeamStyle style;
 	}
 
+	private final List<TierDef> tiers;
 	private final List<TierDef> tiersDescending;
 	private final ValueMode valueMode;
 	private final OwnershipFilter ownershipFilter;
@@ -62,6 +63,7 @@ class TierResolver
 			}
 		}
 		sorted.sort(Comparator.comparingInt(TierDef::getThreshold).reversed());
+		this.tiers = List.copyOf(tiers);
 		this.tiersDescending = sorted;
 		this.valueMode = valueMode;
 		this.ownershipFilter = ownershipFilter;
@@ -120,11 +122,34 @@ class TierResolver
 		{
 			if (highestValue >= tier.getThreshold())
 			{
-				return new Resolution(Resolution.Kind.TIER, tier.getIndex(),
-					tier.getPrimary(), tier.getSecondary(), tier.getStyle());
+				return toResolution(tier);
 			}
 		}
 
 		return Resolution.NONE;
+	}
+
+	Resolution highlight()
+	{
+		return highlightResolution;
+	}
+
+	Resolution tier(int index)
+	{
+		for (TierDef tier : tiers)
+		{
+			if (tier.getIndex() == index)
+			{
+				return toResolution(tier);
+			}
+		}
+
+		return Resolution.NONE;
+	}
+
+	private static Resolution toResolution(TierDef tier)
+	{
+		return new Resolution(Resolution.Kind.TIER, tier.getIndex(),
+			tier.getPrimary(), tier.getSecondary(), tier.getStyle());
 	}
 }

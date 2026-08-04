@@ -33,6 +33,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemLayer;
+import net.runelite.api.Player;
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
 import net.runelite.api.coords.WorldPoint;
@@ -66,6 +67,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 	private static final String GROUND_ITEMS_HIGHLIGHTED_KEY = "highlightedItems";
 	private static final String GROUND_ITEMS_HIDDEN_KEY = "hiddenItems";
 	private static final String GROUND_ITEMS_OWNERSHIP_KEY = "ownershipFilterMode";
+	private static final String PREVIEW_KEY_PREFIX = "preview";
 
 	@Inject
 	private Client client;
@@ -91,6 +93,8 @@ public class LootBeamsDeluxePlugin extends Plugin
 	// loads, plugin startup) — only genuinely fresh drops should get a fanfare
 	private int suppressFanfareUntilTick;
 
+	private WorldPoint previewTile;
+
 	@Provides
 	LootBeamsDeluxeConfig provideConfig(ConfigManager configManager)
 	{
@@ -103,7 +107,11 @@ public class LootBeamsDeluxePlugin extends Plugin
 		beamManager = new BeamManager(client, clientThread);
 		tierResolver = TierResolver.fromConfig(config, ownershipFilter());
 		suppressFanfareUntilTick = client.getTickCount() + 1;
-		clientThread.invoke(this::rebuild);
+		clientThread.invoke(() ->
+		{
+			rebuild();
+			restartPreviewBeam();
+		});
 	}
 
 	@Override
@@ -111,6 +119,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 	{
 		clientThread.invokeLater(() -> beamManager.removeAll());
 		trackedItems.clear();
+		previewTile = null;
 	}
 
 	@Subscribe
@@ -201,6 +210,12 @@ public class LootBeamsDeluxePlugin extends Plugin
 	public void onConfigChanged(ConfigChanged event)
 	{
 		boolean ownGroup = LootBeamsDeluxeConfig.GROUP.equals(event.getGroup());
+		if (ownGroup && event.getKey().startsWith(PREVIEW_KEY_PREFIX))
+		{
+			clientThread.invokeLater(this::restartPreviewBeam);
+			return;
+		}
+
 		boolean syncedGroundItemsList = config.syncGroundItems()
 			&& GROUND_ITEMS_GROUP.equals(event.getGroup())
 			&& (GROUND_ITEMS_HIGHLIGHTED_KEY.equals(event.getKey()) || GROUND_ITEMS_HIDDEN_KEY.equals(event.getKey()));
@@ -234,6 +249,54 @@ public class LootBeamsDeluxePlugin extends Plugin
 		{
 			handleTile(worldPoint, false);
 		}
+
+		if (previewTile != null)
+		{
+			beamManager.handleTile(previewTile, previewResolution(), null);
+		}
+	}
+
+	private void restartPreviewBeam()
+	{
+		if (previewTile != null)
+		{
+			beamManager.handleTile(previewTile, Resolution.NONE, null);
+			previewTile = null;
+		}
+
+		Player player = client.getLocalPlayer();
+		Resolution resolution = previewResolution();
+		if (player == null || resolution.isBeamless())
+		{
+			return;
+		}
+
+		previewTile = config.previewDirection().from(player.getWorldLocation(), config.previewDistance());
+		beamManager.handleTile(previewTile, resolution,
+			config.fanfareMode().qualifies(resolution) ? fanfare(resolution) : null);
+	}
+
+	// highlight wins outright and otherwise the highest ticked tier does, same as a real tile
+	private Resolution previewResolution()
+	{
+		if (config.previewHighlight())
+		{
+			return tierResolver.highlight();
+		}
+
+		boolean[] ticked = {
+			config.previewTier1(), config.previewTier2(), config.previewTier3(), config.previewTier4(),
+			config.previewTier5(), config.previewTier6(), config.previewTier7(), config.previewTier8()};
+
+		for (int index = ticked.length; index >= 1; index--)
+		{
+			if (ticked[index - 1])
+			{
+				return tierResolver.tier(index);
+			}
+		}
+
+		return Resolution.NONE;
 	}
 
 	private OwnershipFilter ownershipFilter()

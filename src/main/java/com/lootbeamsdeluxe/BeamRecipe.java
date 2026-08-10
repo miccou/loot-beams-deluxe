@@ -101,6 +101,10 @@ class BeamRecipe
 	@Builder.Default
 	boolean loop = true;
 
+	// animation seeking on start
+	@Builder.Default
+	int startPercent = 0;
+
 	// render a second copy half an anim cycle behind, covering the dip when the loop restarts
 	@Builder.Default
 	boolean halfCycleOverlay = false;

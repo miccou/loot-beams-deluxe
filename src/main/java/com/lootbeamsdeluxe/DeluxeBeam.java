@@ -146,6 +146,7 @@ class DeluxeBeam
 				});
 			}
 
+			seek(animationController, 0);
 			runeLiteObject.setAnimationController(animationController);
 			runeLiteObject.setModel(model);
 			updateOverlay();
@@ -174,11 +175,7 @@ class DeluxeBeam
 
 		AnimationController animationController = new AnimationController(client, recipe.getAnimId());
 		animationController.setOnFinished(AnimationController::loop);
-		Animation animation = animationController.getAnimation();
-		if (animation != null)
-		{
-			animationController.setFrame(animation.getNumFrames() / 2);
-		}
+		seek(animationController, 50);
 
 		if (overlay == null)
 		{
@@ -188,6 +185,27 @@ class DeluxeBeam
 		}
 		overlay.setAnimationController(animationController);
 		overlay.setModel(model);
+	}
+
+	private void seek(AnimationController animationController, int offsetPercent)
+	{
+		int percent = recipe.getStartPercent() + offsetPercent;
+		if (percent <= 0)
+		{
+			return;
+		}
+
+		Animation animation = animationController.getAnimation();
+		if (animation == null)
+		{
+			return;
+		}
+
+		int numFrames = animation.getNumFrames();
+		if (numFrames > 0)
+		{
+			animationController.setFrame(numFrames * percent / 100 % numFrames);
+		}
 	}
 
 	@Nullable

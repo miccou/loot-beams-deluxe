@@ -83,6 +83,7 @@ public enum BeamStyle
 		.secondaryFinds(new short[]{960})
 		.scaleX(64)
 		.scaleZ(64)
+		.startPercent(40)
 		.build()),
 
 	// long-looping mist (spotanim 2541) — the model comes translucent out of the cache
@@ -92,6 +93,7 @@ public enum BeamStyle
 		.primaryFinds(new short[]{10543})
 		.ambientAdd(30)
 		.contrastAdd(30)
+		.startPercent(30)
 		.build()),
 
 	// smoke devil cloud (spotanim 642), a slow rolling grey plume. Primary is
@@ -119,6 +121,7 @@ public enum BeamStyle
 		.ambientAdd(30)
 		.contrastAdd(30)
 		.halfCycleOverlay(true)
+		.startPercent(10)
 		.build()),
 
 	// Doom of Mokhaiotl's burrow hole glow (loc 50940) — the plume you see when
@@ -134,6 +137,7 @@ public enum BeamStyle
 		.translateY(18)
 		.translateZ(-70)
 		.ambientAdd(64)
+		.startPercent(30)
 		.build()),
 	;
 

@@ -28,8 +28,8 @@ import java.awt.Color;
 import lombok.Value;
 
 /**
- * A resolved fanfare request: which style to play and the two colours to paint
- * it with — either the tier's beam colours or the custom pair.
+ * A fanfare in flight: the style and the tier's beam colours from the
+ * moment the loot dropped to avoid recolours during animation.
  */
 @Value
 class Fanfare

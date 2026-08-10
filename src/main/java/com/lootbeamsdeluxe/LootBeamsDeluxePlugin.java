@@ -27,6 +27,7 @@ package com.lootbeamsdeluxe;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.inject.Provides;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
@@ -69,6 +70,9 @@ public class LootBeamsDeluxePlugin extends Plugin
 	private static final String GROUND_ITEMS_OWNERSHIP_KEY = "ownershipFilterMode";
 	private static final String PREVIEW_KEY_PREFIX = "preview";
 
+	private static final String LEGACY_FANFARE_MODE_KEY = "fanfareMode";
+	private static final String[] LEGACY_FANFARE_COLOR_KEYS = {"fanfareColor", "fanfareColor1", "fanfareColor2"};
+
 	@Inject
 	private Client client;
 
@@ -105,6 +109,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 	protected void startUp()
 	{
 		beamManager = new BeamManager(client, clientThread);
+		migrateFanfareConfig();
 		tierResolver = TierResolver.fromConfig(config, ownershipFilter());
 		suppressFanfareUntilTick = client.getTickCount() + 1;
 		clientThread.invoke(() ->
@@ -233,7 +238,37 @@ public class LootBeamsDeluxePlugin extends Plugin
 	@Subscribe
 	public void onProfileChanged(ProfileChanged event)
 	{
+		migrateFanfareConfig();
 		clientThread.invokeLater(this::rebuild);
+	}
+
+	// fanfares used to be one global 'Play fanfare' mode naming the lowest tier
+	// that got one — fold that into the per-tier dropdowns and drop the old keys
+	private void migrateFanfareConfig()
+	{
+		String mode = configManager.getConfiguration(LootBeamsDeluxeConfig.GROUP, LEGACY_FANFARE_MODE_KEY);
+		if (mode != null)
+		{
+			// OFF, HIGHLIGHTED_ONLY, or TIER_n
+			int lowestTier = mode.startsWith("TIER_") ? Integer.parseInt(mode.substring(5)) : 9;
+			for (int index = lowestTier; index <= 8; index++)
+			{
+				configManager.setConfiguration(LootBeamsDeluxeConfig.GROUP, "tier" + index + "Fanfare", FanfareOverride.DEFAULT);
+			}
+
+			if (!"OFF".equals(mode))
+			{
+				configManager.setConfiguration(LootBeamsDeluxeConfig.GROUP, "highlightFanfare", FanfareOverride.DEFAULT);
+			}
+
+			configManager.unsetConfiguration(LootBeamsDeluxeConfig.GROUP, LEGACY_FANFARE_MODE_KEY);
+		}
+
+		// custom fanfare colours are gone, they always follow the beam now
+		for (String key : LEGACY_FANFARE_COLOR_KEYS)
+		{
+			configManager.unsetConfiguration(LootBeamsDeluxeConfig.GROUP, key);
+		}
 	}
 
 	private void rebuild()
@@ -272,8 +307,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 		}
 
 		previewTile = config.previewDirection().from(player.getWorldLocation(), config.previewDistance());
-		beamManager.handleTile(previewTile, resolution,
-			config.fanfareMode().qualifies(resolution) ? fanfare(resolution) : null);
+		beamManager.handleTile(previewTile, resolution, fanfare(resolution));
 	}
 
 	// highlight wins outright and otherwise the highest ticked tier does, same as a real tile
@@ -311,20 +345,15 @@ public class LootBeamsDeluxePlugin extends Plugin
 	{
 		Resolution resolution = tierResolver.resolve(trackedItems.row(worldPoint).values(), listSync,
 			client.getVarbitValue(VarbitID.IRONMAN));
-		boolean playFanfare = isNewSpawn
-			&& client.getTickCount() > suppressFanfareUntilTick
-			&& config.fanfareMode().qualifies(resolution);
+		boolean playFanfare = isNewSpawn && client.getTickCount() > suppressFanfareUntilTick;
 		beamManager.handleTile(worldPoint, resolution, playFanfare ? fanfare(resolution) : null);
 	}
 
-	// colours resolved here because 'Match beam' needs the tier's palette
-	private Fanfare fanfare(Resolution resolution)
+	@Nullable
+	private static Fanfare fanfare(Resolution resolution)
 	{
-		if (config.fanfareColor() == FanfareColor.CUSTOM)
-		{
-			return new Fanfare(config.fanfareStyle(), config.fanfareColor1(), config.fanfareColor2());
-		}
-		return new Fanfare(config.fanfareStyle(), resolution.getPrimary(), resolution.getSecondary());
+		FanfareStyle style = resolution.getFanfare();
+		return style == null ? null : new Fanfare(style, resolution.getPrimary(), resolution.getSecondary());
 	}
 
 	private TrackedItem buildTrackedItem(ItemLayer itemLayer, TileItem item)

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import javax.annotation.Nullable;
 import lombok.Value;
 
 /** Immutable snapshot of the tier/highlight config — rebuilt whenever config changes. */
@@ -42,6 +43,9 @@ class TierResolver
 		Color primary;
 		Color secondary;
 		BeamStyle style;
+
+		@Nullable
+		FanfareStyle fanfare;
 	}
 
 	private final List<TierDef> tiers;
@@ -52,7 +56,8 @@ class TierResolver
 	private final Resolution highlightResolution;
 
 	TierResolver(List<TierDef> tiers, ValueMode valueMode, OwnershipFilter ownershipFilter,
-		boolean showHighlightBeam, Color highlightPrimary, Color highlightSecondary, BeamStyle highlightStyle)
+		boolean showHighlightBeam, Color highlightPrimary, Color highlightSecondary, BeamStyle highlightStyle,
+		@Nullable FanfareStyle highlightFanfare)
 	{
 		List<TierDef> sorted = new ArrayList<>();
 		for (TierDef tier : tiers)
@@ -69,25 +74,26 @@ class TierResolver
 		this.ownershipFilter = ownershipFilter;
 		this.showHighlightBeam = showHighlightBeam;
 		this.highlightResolution = new Resolution(Resolution.Kind.HIGHLIGHTED, 0,
-			highlightPrimary, highlightSecondary, highlightStyle);
+			highlightPrimary, highlightSecondary, highlightStyle, highlightFanfare);
 	}
 
 	static TierResolver fromConfig(LootBeamsDeluxeConfig config, OwnershipFilter ownershipFilter)
 	{
 		BeamStyle defaultStyle = config.defaultStyle();
+		FanfareStyle defaultFanfare = config.fanfareStyle();
 		List<TierDef> tiers = List.of(
-			new TierDef(1, config.tier1Value(), config.tier1BeamColor(), config.tier1SecondaryColor(), config.tier1Style().resolve(defaultStyle)),
-			new TierDef(2, config.tier2Value(), config.tier2BeamColor(), config.tier2SecondaryColor(), config.tier2Style().resolve(defaultStyle)),
-			new TierDef(3, config.tier3Value(), config.tier3BeamColor(), config.tier3SecondaryColor(), config.tier3Style().resolve(defaultStyle)),
-			new TierDef(4, config.tier4Value(), config.tier4BeamColor(), config.tier4SecondaryColor(), config.tier4Style().resolve(defaultStyle)),
-			new TierDef(5, config.tier5Value(), config.tier5BeamColor(), config.tier5SecondaryColor(), config.tier5Style().resolve(defaultStyle)),
-			new TierDef(6, config.tier6Value(), config.tier6BeamColor(), config.tier6SecondaryColor(), config.tier6Style().resolve(defaultStyle)),
-			new TierDef(7, config.tier7Value(), config.tier7BeamColor(), config.tier7SecondaryColor(), config.tier7Style().resolve(defaultStyle)),
-			new TierDef(8, config.tier8Value(), config.tier8BeamColor(), config.tier8SecondaryColor(), config.tier8Style().resolve(defaultStyle)));
+			new TierDef(1, config.tier1Value(), config.tier1BeamColor(), config.tier1SecondaryColor(), config.tier1Style().resolve(defaultStyle), config.tier1Fanfare().resolve(defaultFanfare)),
+			new TierDef(2, config.tier2Value(), config.tier2BeamColor(), config.tier2SecondaryColor(), config.tier2Style().resolve(defaultStyle), config.tier2Fanfare().resolve(defaultFanfare)),
+			new TierDef(3, config.tier3Value(), config.tier3BeamColor(), config.tier3SecondaryColor(), config.tier3Style().resolve(defaultStyle), config.tier3Fanfare().resolve(defaultFanfare)),
+			new TierDef(4, config.tier4Value(), config.tier4BeamColor(), config.tier4SecondaryColor(), config.tier4Style().resolve(defaultStyle), config.tier4Fanfare().resolve(defaultFanfare)),
+			new TierDef(5, config.tier5Value(), config.tier5BeamColor(), config.tier5SecondaryColor(), config.tier5Style().resolve(defaultStyle), config.tier5Fanfare().resolve(defaultFanfare)),
+			new TierDef(6, config.tier6Value(), config.tier6BeamColor(), config.tier6SecondaryColor(), config.tier6Style().resolve(defaultStyle), config.tier6Fanfare().resolve(defaultFanfare)),
+			new TierDef(7, config.tier7Value(), config.tier7BeamColor(), config.tier7SecondaryColor(), config.tier7Style().resolve(defaultStyle), config.tier7Fanfare().resolve(defaultFanfare)),
+			new TierDef(8, config.tier8Value(), config.tier8BeamColor(), config.tier8SecondaryColor(), config.tier8Style().resolve(defaultStyle), config.tier8Fanfare().resolve(defaultFanfare)));
 
 		return new TierResolver(tiers, config.priceMode(), ownershipFilter, config.showHighlightBeam(),
 			config.highlightBeamColor(), config.highlightSecondaryColor(),
-			config.highlightStyle().resolve(defaultStyle));
+			config.highlightStyle().resolve(defaultStyle), config.highlightFanfare().resolve(defaultFanfare));
 	}
 
 	// filtered-out items are skipped, highlighted wins outright, hidden is
@@ -150,6 +156,6 @@ class TierResolver
 	private static Resolution toResolution(TierDef tier)
 	{
 		return new Resolution(Resolution.Kind.TIER, tier.getIndex(),
-			tier.getPrimary(), tier.getSecondary(), tier.getStyle());
+			tier.getPrimary(), tier.getSecondary(), tier.getStyle(), tier.getFanfare());
 	}
 }

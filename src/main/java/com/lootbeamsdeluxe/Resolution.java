@@ -25,6 +25,7 @@
 package com.lootbeamsdeluxe;
 
 import java.awt.Color;
+import javax.annotation.Nullable;
 import lombok.Value;
 
 /** What a tile's items resolved to: nothing, a value tier, or a highlighted beam. */
@@ -38,13 +39,17 @@ class Resolution
 		HIGHLIGHTED,
 	}
 
-	static final Resolution NONE = new Resolution(Kind.NONE, 0, null, null, null);
+	static final Resolution NONE = new Resolution(Kind.NONE, 0, null, null, null, null);
 
 	Kind kind;
 	int tierIndex;
 	Color primary;
 	Color secondary;
 	BeamStyle style;
+
+	// null when this tier has its fanfare turned off
+	@Nullable
+	FanfareStyle fanfare;
 
 	boolean isBeamless()
 	{

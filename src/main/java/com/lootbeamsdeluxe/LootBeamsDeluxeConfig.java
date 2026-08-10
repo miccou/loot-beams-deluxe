@@ -61,10 +61,21 @@ public interface LootBeamsDeluxeConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "fanfareStyle",
+		name = "Default fanfare",
+		description = "Entrance effect used by tiers set to 'Same as default'.",
+		position = 2
+	)
+	default FanfareStyle fanfareStyle()
+	{
+		return FanfareStyle.LIGHTNING;
+	}
+
+	@ConfigItem(
 		keyName = "syncGroundItems",
 		name = "Use Ground Items lists",
 		description = "Reuse the highlighted and hidden item lists from the Ground Items plugin, so you only manage one set of lists.",
-		position = 2
+		position = 3
 	)
 	default boolean syncGroundItems()
 	{
@@ -76,7 +87,7 @@ public interface LootBeamsDeluxeConfig extends Config
 		name = "Ownership filter",
 		description = "Which items on a tile count towards its beam. 'Drops' is yours and your group's only, "
 			+ "'Takeable' also hides what an ironman can't pick up. Follows Ground Items' own setting by default.",
-		position = 3
+		position = 4
 	)
 	default OwnershipFilter ownershipFilter()
 	{
@@ -87,75 +98,18 @@ public interface LootBeamsDeluxeConfig extends Config
 		keyName = "additionalHighlights",
 		name = "Also highlight",
 		description = "Extra items that always get the highlight beam (comma separated, supports * wildcards and name>quantity).",
-		position = 4
+		position = 5
 	)
 	default String additionalHighlights()
 	{
 		return "";
 	}
 
-	@ConfigItem(
-		keyName = "fanfareMode",
-		name = "Play fanfare",
-		description = "Play the fanfare on the tile the moment qualifying loot drops, before the beam starts.",
-		position = 5
-	)
-	default FanfareMode fanfareMode()
-	{
-		return FanfareMode.OFF;
-	}
-
-	@ConfigItem(
-		keyName = "fanfareStyle",
-		name = "Fanfare style",
-		description = "The entrance effect to play: the ToA Wardens lightning sequence, a column that rises from the ground and sinks back, the Combat Achievements trophy teleport, or Drakan's incinerate fireball.",
-		position = 6
-	)
-	default FanfareStyle fanfareStyle()
-	{
-		return FanfareStyle.LIGHTNING;
-	}
-
-	@ConfigItem(
-		keyName = "fanfareColor",
-		name = "Fanfare colors",
-		description = "Match the beam colors of the loot's tier (so each tier gets its own fanfare), or pick two custom colors below.",
-		position = 7
-	)
-	default FanfareColor fanfareColor()
-	{
-		return FanfareColor.MATCH_BEAM;
-	}
-
-	@Alpha
-	@ConfigItem(
-		keyName = "fanfareColor1",
-		name = "Custom color 1",
-		description = "Main fanfare color (the strike) when 'Custom' is selected.",
-		position = 8
-	)
-	default Color fanfareColor1()
-	{
-		return new Color(0xF12E2E);
-	}
-
-	@Alpha
-	@ConfigItem(
-		keyName = "fanfareColor2",
-		name = "Custom color 2",
-		description = "Accent fanfare color (the warning flash or the effect's secondary detail) when 'Custom' is selected.",
-		position = 9
-	)
-	default Color fanfareColor2()
-	{
-		return new Color(0xFFCC33);
-	}
-
 	// -- Highlighted items ---------------------------------------------------
 
 	@ConfigSection(
 		name = "Highlighted items",
-		description = "Beam settings for explicitly highlighted items.",
+		description = "Beam and fanfare settings for explicitly highlighted items.",
 		position = 10,
 		closedByDefault = true
 	)
@@ -211,11 +165,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "highlightFanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when a highlighted item drops, before the beam starts.",
+		position = 4,
+		section = highlightedSection
+	)
+	default FanfareOverride highlightFanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 1 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 1 (lowest)",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 11,
 		closedByDefault = true
 	)
@@ -272,11 +238,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "tier1Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier1Section
+	)
+	default FanfareOverride tier1Fanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 2 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 2",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 12,
 		closedByDefault = true
 	)
@@ -333,11 +311,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "tier2Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier2Section
+	)
+	default FanfareOverride tier2Fanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 3 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 3",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 13,
 		closedByDefault = true
 	)
@@ -394,11 +384,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "tier3Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier3Section
+	)
+	default FanfareOverride tier3Fanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 4 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 4",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 14,
 		closedByDefault = true
 	)
@@ -455,11 +457,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "tier4Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier4Section
+	)
+	default FanfareOverride tier4Fanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 5 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 5",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 15,
 		closedByDefault = true
 	)
@@ -516,11 +530,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "tier5Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier5Section
+	)
+	default FanfareOverride tier5Fanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 6 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 6",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 16,
 		closedByDefault = true
 	)
@@ -577,11 +603,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "tier6Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier6Section
+	)
+	default FanfareOverride tier6Fanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 7 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 7",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 17,
 		closedByDefault = true
 	)
@@ -638,11 +676,23 @@ public interface LootBeamsDeluxeConfig extends Config
 		return StyleOverride.DEFAULT;
 	}
 
+	@ConfigItem(
+		keyName = "tier7Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier7Section
+	)
+	default FanfareOverride tier7Fanfare()
+	{
+		return FanfareOverride.OFF;
+	}
+
 	// -- Tier 8 ---------------------------------------------------------------
 
 	@ConfigSection(
 		name = "Tier 8 (highest)",
-		description = "Threshold, colors, and style for this tier.",
+		description = "Threshold, colors, style, and fanfare for this tier.",
 		position = 18,
 		closedByDefault = true
 	)
@@ -697,6 +747,18 @@ public interface LootBeamsDeluxeConfig extends Config
 	default StyleOverride tier8Style()
 	{
 		return StyleOverride.DEFAULT;
+	}
+
+	@ConfigItem(
+		keyName = "tier8Fanfare",
+		name = "Fanfare",
+		description = "Entrance effect played on the tile when loot of this tier drops, before the beam starts.",
+		position = 4,
+		section = tier8Section
+	)
+	default FanfareOverride tier8Fanfare()
+	{
+		return FanfareOverride.OFF;
 	}
 
 	// -- Preview beams ---------------------------------------------------------

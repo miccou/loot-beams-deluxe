@@ -6,6 +6,7 @@ import net.runelite.api.TileItem;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TierResolverTest
 {
@@ -22,12 +23,17 @@ public class TierResolverTest
 
 	private static TierResolver resolver(ValueMode mode, OwnershipFilter filter, boolean showHighlightBeam, TierResolver.TierDef... tiers)
 	{
-		return new TierResolver(List.of(tiers), mode, filter, showHighlightBeam, P, S, BeamStyle.MODERN);
+		return new TierResolver(List.of(tiers), mode, filter, showHighlightBeam, P, S, BeamStyle.MODERN, FanfareStyle.LIGHTNING);
 	}
 
 	private static TierResolver.TierDef tier(int index, int threshold)
 	{
-		return new TierResolver.TierDef(index, threshold, P, S, BeamStyle.MODERN);
+		return tier(index, threshold, null);
+	}
+
+	private static TierResolver.TierDef tier(int index, int threshold, FanfareStyle fanfare)
+	{
+		return new TierResolver.TierDef(index, threshold, P, S, BeamStyle.MODERN, fanfare);
 	}
 
 	private static TrackedItem item(String name, int quantity, int gePrice, int haPrice)
@@ -182,6 +188,26 @@ public class TierResolverTest
 
 		assertEquals(Resolution.Kind.TIER, resolver.resolve(
 			List.of(item("Pricey", 1, 50_000, 0, TileItem.OWNERSHIP_OTHER)), lists("", ""), IRONMAN).getKind());
+	}
+
+	@Test
+	public void fanfareComesFromTheResolvedTier()
+	{
+		TierResolver resolver = resolver(ValueMode.HIGHEST, true,
+			tier(1, 100, null), tier(2, 10_000, FanfareStyle.RISING_COLUMN));
+
+		assertNull(resolver.resolve(List.of(item("Cheap", 1, 150, 0)), lists("", ""), MAIN).getFanfare());
+		assertEquals(FanfareStyle.RISING_COLUMN,
+			resolver.resolve(List.of(item("Pricey", 1, 50_000, 0)), lists("", ""), MAIN).getFanfare());
+	}
+
+	@Test
+	public void highlightedItemsUseTheHighlightFanfare()
+	{
+		TierResolver resolver = resolver(ValueMode.HIGHEST, true, tier(1, 100, FanfareStyle.RISING_COLUMN));
+
+		assertEquals(FanfareStyle.LIGHTNING,
+			resolver.resolve(List.of(item("Vial", 1, 1, 1)), lists("Vial", ""), MAIN).getFanfare());
 	}
 
 	@Test

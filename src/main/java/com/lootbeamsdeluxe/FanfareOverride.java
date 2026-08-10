@@ -24,44 +24,47 @@
  */
 package com.lootbeamsdeluxe;
 
+import javax.annotation.Nullable;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-/**
- * When to play the drop fanfare. Tier modes mean "that tier and above",
- * and all of them include highlighted items.
- */
+/** Per-tier fanfare pick: silent, the default style, or a style of its own. */
 @Getter
-@RequiredArgsConstructor
-public enum FanfareMode
+public enum FanfareOverride
 {
-	OFF("Off", Integer.MAX_VALUE, false),
-	HIGHLIGHTED_ONLY("Highlighted items only", Integer.MAX_VALUE, true),
-	TIER_8("Tier 8 and highlighted", 8, true),
-	TIER_7("Tier 7 and above", 7, true),
-	TIER_6("Tier 6 and above", 6, true),
-	TIER_5("Tier 5 and above", 5, true),
-	TIER_4("Tier 4 and above", 4, true),
-	TIER_3("Tier 3 and above", 3, true),
-	TIER_2("Tier 2 and above", 2, true),
-	TIER_1("Tier 1 and above", 1, true),
+	OFF("Off", null),
+	DEFAULT("Same as default", null),
+	LIGHTNING(FanfareStyle.LIGHTNING),
+	RISING_COLUMN(FanfareStyle.RISING_COLUMN),
+	TROPHY_TELEPORT(FanfareStyle.TROPHY_TELEPORT),
+	DRAKAN_INCINERATE(FanfareStyle.DRAKAN_INCINERATE),
 	;
 
 	private final String displayName;
-	private final int minTier;
-	private final boolean includesHighlighted;
 
-	boolean qualifies(Resolution resolution)
+	@Nullable
+	private final FanfareStyle style;
+
+	FanfareOverride(String displayName, @Nullable FanfareStyle style)
 	{
-		switch (resolution.getKind())
+		this.displayName = displayName;
+		this.style = style;
+	}
+
+	FanfareOverride(FanfareStyle style)
+	{
+		this(style.getDisplayName(), style);
+	}
+
+	/** Null means this tier plays no fanfare. */
+	@Nullable
+	FanfareStyle resolve(FanfareStyle defaultStyle)
+	{
+		if (this == OFF)
 		{
-			case HIGHLIGHTED:
-				return includesHighlighted;
-			case TIER:
-				return resolution.getTierIndex() >= minTier;
-			default:
-				return false;
+			return null;
 		}
+
+		return style == null ? defaultStyle : style;
 	}
 
 	@Override

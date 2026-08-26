@@ -37,6 +37,7 @@ public enum FanfareOverride
 	RISING_COLUMN(FanfareStyle.RISING_COLUMN),
 	TROPHY_TELEPORT(FanfareStyle.TROPHY_TELEPORT),
 	DRAKAN_INCINERATE(FanfareStyle.DRAKAN_INCINERATE),
+	REVENANT_HEAL(FanfareStyle.REVENANT_HEAL),
 	;
 
 	private final String displayName;

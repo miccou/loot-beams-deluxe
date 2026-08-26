@@ -80,6 +80,18 @@ public enum FanfareStyle
 		.contrastAdd(40)
 		.loop(false)
 		.build()),
+
+	// the forked bolt a revenant calls down on itself when it heals below half
+	// health (spotanim 1221, which Jagex reuses from the God Wars Saradomin light
+	// attack). Single-colour model, so the whole bolt takes the primary colour
+	REVENANT_HEAL("Revenant heal", null, BeamRecipe.builder()
+		.modelId(28163)
+		.animId(7075)
+		.primaryFinds(new short[]{-31784})
+		.ambientAdd(20)
+		.contrastAdd(20)
+		.loop(false)
+		.build()),
 	;
 
 	private final String displayName;

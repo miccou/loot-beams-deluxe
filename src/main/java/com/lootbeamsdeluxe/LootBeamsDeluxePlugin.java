@@ -362,7 +362,7 @@ public class LootBeamsDeluxePlugin extends Plugin
 		final ItemComposition itemComposition = itemManager.getItemComposition(itemId);
 		final int realItemId = itemComposition.getNote() != -1 ? itemComposition.getLinkedNoteId() : itemId;
 
-		int gePrice;
+		long gePrice;
 		int haPrice;
 		if (realItemId == ItemID.COINS)
 		{

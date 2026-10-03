@@ -37,7 +37,7 @@ class TrackedItem
 {
 	private final int itemId;
 	private final String name;
-	private final int gePrice;
+	private final long gePrice;
 	private final int haPrice;
 	private final int worldViewId;
 	private final int ownership;
@@ -45,6 +45,6 @@ class TrackedItem
 
 	long stackValue(ValueMode mode)
 	{
-		return (long) mode.unitValue(gePrice, haPrice) * quantity;
+		return mode.unitValue(gePrice, haPrice) * quantity;
 	}
 }

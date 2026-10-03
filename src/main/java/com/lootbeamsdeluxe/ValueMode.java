@@ -34,7 +34,7 @@ public enum ValueMode
 	GRAND_EXCHANGE("Grand Exchange")
 	{
 		@Override
-		int unitValue(int gePrice, int haPrice)
+		long unitValue(long gePrice, int haPrice)
 		{
 			return gePrice;
 		}
@@ -42,7 +42,7 @@ public enum ValueMode
 	HIGH_ALCHEMY("High Alchemy")
 	{
 		@Override
-		int unitValue(int gePrice, int haPrice)
+		long unitValue(long gePrice, int haPrice)
 		{
 			return haPrice;
 		}
@@ -50,7 +50,7 @@ public enum ValueMode
 	HIGHEST("Highest")
 	{
 		@Override
-		int unitValue(int gePrice, int haPrice)
+		long unitValue(long gePrice, int haPrice)
 		{
 			return Math.max(gePrice, haPrice);
 		}
@@ -59,7 +59,7 @@ public enum ValueMode
 
 	private final String displayName;
 
-	abstract int unitValue(int gePrice, int haPrice);
+	abstract long unitValue(long gePrice, int haPrice);
 
 	@Override
 	public String toString()

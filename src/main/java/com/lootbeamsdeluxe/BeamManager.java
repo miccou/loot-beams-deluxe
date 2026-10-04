@@ -41,7 +41,7 @@ import net.runelite.client.callback.ClientThread;
 class BeamManager
 {
 	// give up and show the beam if the fanfare anims never report finishing
-	private static final int FANFARE_TIMEOUT_TICKS = 8;
+	private static final int FANFARE_TIMEOUT_TICKS = 12;
 
 	@AllArgsConstructor
 	private static class FanfareState

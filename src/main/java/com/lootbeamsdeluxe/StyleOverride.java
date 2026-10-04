@@ -40,7 +40,13 @@ public enum StyleOverride
 	CLOUD("Cloud", BeamStyle.CLOUD),
 	SMOKE("Smoke", BeamStyle.SMOKE),
 	MIASMA("Miasma", BeamStyle.MIASMA),
-	MOKHAIOTL("Mokhaiotl Glow", BeamStyle.MOKHAIOTL),
+	MOKHAIOTL("Mokhaiotl glow", BeamStyle.MOKHAIOTL),
+	LEVEL_UP_FIREWORKS("Level up fireworks", BeamStyle.LEVEL_UP_FIREWORKS),
+	SHADES("Dancing shade", BeamStyle.SHADES),
+	QUEST_CAPE_UFO("Quest cape", BeamStyle.QUEST_CAPE_UFO),
+	KREE_TORNADO("Kree'arra tornado", BeamStyle.KREE_TORNADO),
+	SUN_KERIS("Sun keris spec", BeamStyle.SUN_KERIS),
+	YAMA_SHADOW("Yama shadow", BeamStyle.YAMA_SHADOW),
 	;
 
 	private final String displayName;

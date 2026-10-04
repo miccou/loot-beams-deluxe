@@ -31,6 +31,7 @@ import javax.annotation.Nullable;
 import net.runelite.api.Animation;
 import net.runelite.api.AnimationController;
 import net.runelite.api.Client;
+import net.runelite.api.Constants;
 import net.runelite.api.JagexColor;
 import net.runelite.api.Model;
 import net.runelite.api.ModelData;
@@ -56,6 +57,7 @@ class DeluxeBeam
 	private final Runnable onAnimationFinished;
 
 	// second copy of the model, only when the recipe wants a half-cycle overlay
+	// or overlapping passes
 	@Nullable
 	private RuneLiteObject overlay;
 
@@ -63,6 +65,10 @@ class DeluxeBeam
 	private Color primary;
 	private Color secondary;
 	private boolean removed;
+	private boolean finishReported;
+
+	// bumped on every rebuild so frame watchers from the old build give up
+	private int generation;
 
 	DeluxeBeam(Client client, ClientThread clientThread, WorldPoint worldPoint,
 		BeamRecipe recipe, Color primary, Color secondary, @Nullable Runnable onAnimationFinished)
@@ -73,13 +79,12 @@ class DeluxeBeam
 		this.primary = primary;
 		this.secondary = secondary;
 		this.onAnimationFinished = onAnimationFinished;
-		runeLiteObject = client.createRuneLiteObject();
+		runeLiteObject = new ResizableObject();
 		localPoint = LocalPoint.fromWorld(client, worldPoint);
 		plane = client.getPlane();
 
-		update();
-
 		runeLiteObject.setLocation(localPoint, plane);
+		update();
 		runeLiteObject.setActive(true);
 	}
 
@@ -128,28 +133,41 @@ class DeluxeBeam
 				return false;
 			}
 
-			AnimationController animationController = new AnimationController(client, recipe.getAnimId());
-			if (recipe.isLoop())
+			generation++;
+			finishReported = false;
+			boolean overlapping = recipe.getLoopOverlapMs() > 0;
+
+			AnimationController animationController = newAnimationController();
+			if (overlapping)
 			{
-				animationController.setOnFinished(AnimationController::loop);
+				animationController.setOnFinished(ac -> endPass(runeLiteObject, ac));
+			}
+			else if (recipe.isLoop())
+			{
+				animationController.setOnFinished(this::restartLoop);
 			}
 			else
 			{
-				// invokeLater so the handoff doesn't mutate the scene's object
-				// list while the client is mid-way through ticking it
-				animationController.setOnFinished(ac ->
+				animationController.setOnFinished(ac -> reportFinished());
+				if (recipe.getEndPercent() < 100)
 				{
-					if (onAnimationFinished != null)
-					{
-						clientThread.invokeLater(onAnimationFinished);
-					}
-				});
+					whenFrameReached(animationController, frameAt(animationController, recipe.getEndPercent()),
+						this::reportFinished);
+				}
 			}
 
-			seek(animationController, 0);
+			seek(animationController, recipe.getStartPercent());
+			armSkip(animationController);
 			runeLiteObject.setAnimationController(animationController);
 			runeLiteObject.setModel(model);
+			// a rebuild can land while the main copy is hidden between overlapping passes
+			runeLiteObject.setActive(true);
 			updateOverlay();
+
+			if (overlapping && overlay != null)
+			{
+				handOverNearEnd(animationController, overlay, runeLiteObject);
+			}
 			return true;
 		});
 	}
@@ -157,7 +175,8 @@ class DeluxeBeam
 	// client thread only; runs after the main object has its model
 	private void updateOverlay()
 	{
-		if (!recipe.isHalfCycleOverlay())
+		boolean overlapping = recipe.getLoopOverlapMs() > 0;
+		if (!recipe.isHalfCycleOverlay() && !overlapping)
 		{
 			if (overlay != null)
 			{
@@ -173,23 +192,146 @@ class DeluxeBeam
 			return;
 		}
 
-		AnimationController animationController = new AnimationController(client, recipe.getAnimId());
-		animationController.setOnFinished(AnimationController::loop);
-		seek(animationController, 50);
-
 		if (overlay == null)
 		{
-			overlay = client.createRuneLiteObject();
+			overlay = new ResizableObject();
 			overlay.setLocation(localPoint, plane);
-			overlay.setActive(true);
 		}
-		overlay.setAnimationController(animationController);
 		overlay.setModel(model);
+
+		if (overlapping)
+		{
+			// sits hidden until the main copy hands over to it
+			overlay.setActive(false);
+			return;
+		}
+
+		AnimationController animationController = newAnimationController();
+		animationController.setOnFinished(this::restartLoop);
+		seek(animationController, recipe.getStartPercent() + 50);
+		armSkip(animationController);
+		overlay.setAnimationController(animationController);
+		overlay.setActive(true);
 	}
 
-	private void seek(AnimationController animationController, int offsetPercent)
+	private void restartLoop(AnimationController animationController)
 	{
-		int percent = recipe.getStartPercent() + offsetPercent;
+		animationController.loop();
+		seek(animationController, recipe.getLoopPercent());
+		armSkip(animationController);
+	}
+
+	private void armSkip(AnimationController animationController)
+	{
+		if (recipe.getSkipToPercent() <= 0)
+		{
+			return;
+		}
+
+		int skipTo = frameAt(animationController, recipe.getSkipToPercent());
+		whenFrameReached(animationController, frameAt(animationController, recipe.getSkipFromPercent()), () ->
+		{
+			// a pass that started past the skip shouldn't get pulled back to it
+			if (animationController.getFrame() < skipTo)
+			{
+				animationController.setFrame(skipTo);
+			}
+		});
+	}
+
+	private void startPass(RuneLiteObject copy, RuneLiteObject other)
+	{
+		AnimationController animationController = newAnimationController();
+		animationController.setOnFinished(ac -> endPass(copy, ac));
+		seek(animationController, recipe.getLoopPercent());
+		armSkip(animationController);
+		copy.setAnimationController(animationController);
+		copy.setActive(true);
+		handOverNearEnd(animationController, other, copy);
+	}
+
+	// hold the last frame until the copy is hidden, rather than snapping back
+	// to the model's rest pose for a frame
+	private void endPass(RuneLiteObject copy, AnimationController animationController)
+	{
+		animationController.setFrame(animationController.getAnimation().getNumFrames() - 1);
+		clientThread.invokeLater(() ->
+		{
+			if (copy.getAnimationController() == animationController)
+			{
+				copy.setActive(false);
+			}
+		});
+	}
+
+	private void handOverNearEnd(AnimationController animationController, RuneLiteObject next, RuneLiteObject current)
+	{
+		Animation animation = animationController.getAnimation();
+		int[] frameLengths = animation == null ? null : animation.getFrameLengths();
+		if (frameLengths == null)
+		{
+			return;
+		}
+
+		// the last frame that still has loopOverlapMs of anim left from its start
+		int handoffFrame = 0;
+		int remaining = 0;
+		for (int frame = frameLengths.length - 1; frame > 0; frame--)
+		{
+			remaining += frameLengths[frame] * Constants.CLIENT_TICK_LENGTH * 100 / recipe.getSpeedPercent();
+			if (remaining >= recipe.getLoopOverlapMs())
+			{
+				handoffFrame = frame;
+				break;
+			}
+		}
+
+		whenFrameReached(animationController, handoffFrame, () -> startPass(next, current));
+	}
+
+	// controllers only report finishing, so anything mid-anim has to poll. Gives
+	// up if the effect is rebuilt or removed first
+	private void whenFrameReached(AnimationController animationController, int frame, Runnable action)
+	{
+		int watching = generation;
+		clientThread.invokeLater(() ->
+		{
+			if (removed || generation != watching)
+			{
+				return true;
+			}
+
+			if (animationController.getFrame() < frame)
+			{
+				return false;
+			}
+
+			action.run();
+			return true;
+		});
+	}
+
+	// invokeLater so the handoff doesn't mutate the scene's object list while
+	// the client is mid-way through ticking it
+	private void reportFinished()
+	{
+		if (finishReported || onAnimationFinished == null)
+		{
+			return;
+		}
+
+		finishReported = true;
+		clientThread.invokeLater(onAnimationFinished);
+	}
+
+	private static int frameAt(AnimationController animationController, int percent)
+	{
+		Animation animation = animationController.getAnimation();
+		return animation == null ? 0 : animation.getNumFrames() * percent / 100;
+	}
+
+	private static void seek(AnimationController animationController, int percent)
+	{
 		if (percent <= 0)
 		{
 			return;
@@ -208,6 +350,60 @@ class DeluxeBeam
 		}
 	}
 
+	private AnimationController newAnimationController()
+	{
+		if (recipe.getSpeedPercent() == 100)
+		{
+			return new AnimationController(client, recipe.getAnimId());
+		}
+		return new SpedUpAnimationController(client, recipe.getAnimId(), recipe.getSpeedPercent());
+	}
+
+	// applies the recipe's resize to each frame after the anim has posed it
+	private class ResizableObject extends RuneLiteObject
+	{
+		ResizableObject()
+		{
+			super(client);
+		}
+
+		@Override
+		public Model getModel()
+		{
+			Model model = super.getModel();
+			int resize = recipe.getResize();
+			// with no anim playing this is the base model itself, which would
+			// shrink a little more every frame if scaled in place
+			if (resize == 128 || model == null || model == getBaseModel())
+			{
+				return model;
+			}
+			return model.scale(resize, resize, resize);
+		}
+	}
+
+	// the object ticks its controller with however many client ticks have
+	// passed, so scaling that count changes the playback speed
+	private static class SpedUpAnimationController extends AnimationController
+	{
+		private final int speedPercent;
+		private int leftover;
+
+		SpedUpAnimationController(Client client, int animId, int speedPercent)
+		{
+			super(client, animId);
+			this.speedPercent = speedPercent;
+		}
+
+		@Override
+		public void tick(int ticks)
+		{
+			int scaled = ticks * speedPercent + leftover;
+			leftover = scaled % 100;
+			super.tick(scaled / 100);
+		}
+	}
+
 	@Nullable
 	private Model buildModel()
 	{
@@ -215,6 +411,22 @@ class DeluxeBeam
 		if (md == null)
 		{
 			return null;
+		}
+
+		int[] extraModelIds = recipe.getExtraModelIds();
+		if (extraModelIds.length > 0)
+		{
+			ModelData[] parts = new ModelData[extraModelIds.length + 1];
+			parts[0] = md;
+			for (int i = 0; i < extraModelIds.length; i++)
+			{
+				parts[i + 1] = client.loadModelData(extraModelIds[i]);
+				if (parts[i + 1] == null)
+				{
+					return null;
+				}
+			}
+			md = client.mergeModels(parts);
 		}
 
 		md = md.cloneColors();
@@ -257,7 +469,7 @@ class DeluxeBeam
 			md.recolor(find, secondaryHsl);
 		}
 
-		if (recipe.getTransparency() >= 0 || hiddenFaces != null)
+		if (recipe.getTransparency() >= 0 || recipe.getTransparencyAdd() > 0 || hiddenFaces != null)
 		{
 			md.cloneTransparencies(true);
 			byte[] transparencies = md.getFaceTransparencies();
@@ -266,6 +478,13 @@ class DeluxeBeam
 				if (recipe.getTransparency() >= 0)
 				{
 					Arrays.fill(transparencies, (byte) recipe.getTransparency());
+				}
+				if (recipe.getTransparencyAdd() > 0)
+				{
+					for (int i = 0; i < transparencies.length; i++)
+					{
+						transparencies[i] = (byte) Math.min(254, (transparencies[i] & 0xff) + recipe.getTransparencyAdd());
+					}
 				}
 				if (hiddenFaces != null)
 				{

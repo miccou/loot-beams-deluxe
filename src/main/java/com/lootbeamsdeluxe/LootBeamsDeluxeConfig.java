@@ -144,7 +144,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "highlightSecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = highlightedSection
 	)
@@ -217,7 +217,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier1SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier1Section
 	)
@@ -290,7 +290,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier2SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier2Section
 	)
@@ -363,7 +363,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier3SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier3Section
 	)
@@ -436,7 +436,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier4SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier4Section
 	)
@@ -509,7 +509,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier5SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier5Section
 	)
@@ -582,7 +582,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier6SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier6Section
 	)
@@ -655,7 +655,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier7SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier7Section
 	)
@@ -728,7 +728,7 @@ public interface LootBeamsDeluxeConfig extends Config
 	@ConfigItem(
 		keyName = "tier8SecondaryColor",
 		name = "Secondary color",
-		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), or bright accents (Smoke, Miasma, Mokhaiotl Glow). Light and Cloud are single-color.",
+		description = "Second color of the effect: the lattice (Modern), bands (Fire), bolts (Electric), saucer (Quest cape), streaks (Kree'arra tornado), claws (Yama shadow), half the bursts (Level up fireworks), or bright accents (Smoke, Miasma, Mokhaiotl glow). Light, Cloud, Dancing shade and Sun keris spec are single-color.",
 		position = 2,
 		section = tier8Section
 	)

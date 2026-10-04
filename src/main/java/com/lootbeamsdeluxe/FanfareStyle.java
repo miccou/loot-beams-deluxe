@@ -92,6 +92,73 @@ public enum FanfareStyle
 		.contrastAdd(20)
 		.loop(false)
 		.build()),
+
+	// Yama's phase two meteor (spotanim 3271). It's a projectile, but its own
+	// anim does the drop from high up and the shatter on landing. Resized from
+	// the real 5x5 down to about 2 tiles, sped up, and stopped as the shards
+	// fade. The rock shell takes primary, the molten cracks and flame spikes
+	// secondary
+	YAMA_METEOR("Yama meteor", null, BeamRecipe.builder()
+		.modelId(14813)
+		.animId(12114)
+		.primaryFinds(new short[]{1556, 1816, 2977})
+		.secondaryFinds(new short[]{2892, 4940, 6998, 6096, 7128})
+		.resize(51)
+		.ambientAdd(30)
+		.contrastAdd(100)
+		.loop(false)
+		.endPercent(90)
+		.speedPercent(150)
+		.build()),
+
+	// Yama's basic flame attack (spotanim 3247) — flames close in on the tile
+	// and burst when he snaps his fingers. Stops before the last few frames,
+	// where a stray flame hangs in the air. Flames take primary, the sparks and
+	// embers secondary
+	YAMA_FLAME("Yama flame", null, BeamRecipe.builder()
+		.modelId(16990)
+		.animId(12099)
+		.primaryFinds(new short[]{5070, 6096, 7128, 8152})
+		.secondaryFinds(new short[]{9160, 9164, 1816, 2977, 3022})
+		.ambientAdd(30)
+		.contrastAdd(100)
+		.loop(false)
+		.endPercent(89)
+		.build()),
+
+	// the cracks Yama's phase two shadow stomp spreads across the floor
+	// (spotanim 3259, not the projectile). Starts on frame 16, where the smoke
+	// ball lands and the cracks begin to spread, with the smoke hidden. The
+	// cracks start from off the model's origin, so they're shifted back over the
+	// tile centre, and lifted a tenth of a tile to stay clear of uneven ground.
+	// The crack outline takes primary, the glowing core secondary
+	YAMA_SHADOW_STOMP("Yama shadow stomp", null, BeamRecipe.builder()
+		.modelId(17000)
+		.animId(12110)
+		.primaryFinds(new short[]{-21950, -22374})
+		.secondaryFinds(new short[]{-22050})
+		.hideFinds(new short[]{0})
+		.translateX(-85)
+		.translateY(-13)
+		.translateZ(80)
+		.ambientAdd(10)
+		.contrastAdd(100)
+		.loop(false)
+		.startPercent(48)
+		.endPercent(94)
+		.build()),
+
+	// the storm cloud that gathers overhead when you make a piece of sanguine
+	// torva (spotanim 2294, a rainless Humidify cloud), cut as it starts to
+	// shrink away. Darker puffs take primary, lighter ones secondary
+	BLOOD_TORVA("Blood torva", null, BeamRecipe.builder()
+		.modelId(46950)
+		.animId(6307)
+		.primaryFinds(new short[]{-22502, -22498})
+		.secondaryFinds(new short[]{-22493, -22489})
+		.loop(false)
+		.endPercent(92)
+		.build()),
 	;
 
 	private final String displayName;

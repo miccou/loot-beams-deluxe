@@ -39,6 +39,10 @@ class BeamRecipe
 	int modelId;
 	int animId;
 
+	// merged onto the main model, for effects made of several body parts
+	@Builder.Default
+	int[] extraModelIds = {};
+
 	// face colours (packed HSL) the primary colour picker replaces
 	@Builder.Default
 	short[] primaryFinds = {};
@@ -68,6 +72,11 @@ class BeamRecipe
 	// 0 (opaque) to 255, written into every face; -1 keeps the cache values
 	@Builder.Default
 	int transparency = -1;
+
+	// added to each face's own transparency, so a model that already fades
+	// out in places keeps its fade
+	@Builder.Default
+	int transparencyAdd = 0;
 
 	// added on top of the client's default ambient/contrast when lighting
 	@Builder.Default
@@ -105,9 +114,39 @@ class BeamRecipe
 	@Builder.Default
 	int startPercent = 0;
 
+	// where a loop restarts, for anims that open with blank frames
+	@Builder.Default
+	int loopPercent = 0;
+
+	// start the next pass on a second copy this long before the current one
+	// ends, so the passes overlap instead of cutting from one to the next
+	@Builder.Default
+	int loopOverlapMs = 0;
+
+	// one-shot anims finish here, for ones with a messy last few frames
+	@Builder.Default
+	int endPercent = 100;
+
+	// jump from skipFromPercent straight to skipToPercent, cutting out a dead
+	// stretch in the middle of an anim. Off while skipToPercent is 0
+	@Builder.Default
+	int skipFromPercent = 0;
+
+	@Builder.Default
+	int skipToPercent = 0;
+
+	// playback speed, 150 = 1.5x
+	@Builder.Default
+	int speedPercent = 100;
+
 	// render a second copy half an anim cycle behind, covering the dip when the loop restarts
 	@Builder.Default
 	boolean halfCycleOverlay = false;
+
+	// scales every animated frame in 1/128ths, the way a spotanim's own resize
+	// works. Unlike scaleX/Y/Z it shrinks movement baked into the anim too
+	@Builder.Default
+	int resize = 128;
 
 	boolean hasScale()
 	{

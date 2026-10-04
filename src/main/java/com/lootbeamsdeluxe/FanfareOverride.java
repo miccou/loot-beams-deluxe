@@ -38,6 +38,10 @@ public enum FanfareOverride
 	TROPHY_TELEPORT(FanfareStyle.TROPHY_TELEPORT),
 	DRAKAN_INCINERATE(FanfareStyle.DRAKAN_INCINERATE),
 	REVENANT_HEAL(FanfareStyle.REVENANT_HEAL),
+	YAMA_METEOR(FanfareStyle.YAMA_METEOR),
+	YAMA_FLAME(FanfareStyle.YAMA_FLAME),
+	YAMA_SHADOW_STOMP(FanfareStyle.YAMA_SHADOW_STOMP),
+	BLOOD_TORVA(FanfareStyle.BLOOD_TORVA),
 	;
 
 	private final String displayName;

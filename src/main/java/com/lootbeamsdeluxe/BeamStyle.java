@@ -128,7 +128,7 @@ public enum BeamStyle
 	// a unique drops. The dirt/hole geometry is hidden so only the glow column
 	// is left; primary is the body, secondary the bright tip. The loc model sits
 	// off its origin, so the glow gets translated back over the tile centre
-	MOKHAIOTL("Mokhaiotl Glow", BeamRecipe.builder()
+	MOKHAIOTL("Mokhaiotl glow", BeamRecipe.builder()
 		.modelId(57324)
 		.animId(2755)
 		.primaryFinds(new short[]{8134, 8123, 8101})
@@ -138,6 +138,82 @@ public enum BeamStyle
 		.translateZ(-70)
 		.ambientAdd(64)
 		.startPercent(30)
+		.build()),
+
+	// the level up fireworks (spotanim 199) going off on repeat. There are four
+	// burst colours, two follow primary and two secondary
+	LEVEL_UP_FIREWORKS("Level up fireworks", BeamRecipe.builder()
+		.modelId(411)
+		.animId(913)
+		.primaryFinds(new short[]{3030, 11222})
+		.secondaryFinds(new short[]{-25485, 23006})
+		.build()),
+
+	// a ghostly player doing the goblin salute. The body parts are the Ghosts
+	// Ahoy villager's (npc 2998), which already fade out towards the legs and
+	// take player anims; made a bit more see-through on top of that. One
+	// colour, so the whole ghost is primary
+	SHADES("Dancing shade", BeamRecipe.builder()
+		.modelId(5212)
+		.extraModelIds(new int[]{5219, 5209, 5216})
+		.animId(2128)
+		.primaryFinds(new short[]{17467})
+		.transparencyAdd(70)
+		.ambientAdd(35)
+		.contrastAdd(35)
+		.build()),
+
+	// the quest cape emote's flying saucer and tractor beam (spotanim 816). The
+	// emote opens with blank frames and then a near-invisible fade in, so it
+	// starts and loops partway into the fade, with a tick of overlap between
+	// passes. Primary is the beam, secondary the saucer; the little zaps stay cyan
+	QUEST_CAPE_UFO("Quest cape", BeamRecipe.builder()
+		.modelId(19086)
+		.animId(4946)
+		.primaryFinds(new short[]{127, -31635, -25373})
+		.secondaryFinds(new short[]{-23744, -23604, -24100})
+		.ambientAdd(60)
+		.startPercent(15)
+		.loopPercent(15)
+		.loopOverlapMs(600)
+		.build()),
+
+	// Kree'arra's whirlwind (spotanims 1199/1200 — ranged is the raw grey, magic
+	// the same model tinted blue). Primary is the see-through body, secondary
+	// the streaks
+	KREE_TORNADO("Kree'arra tornado", BeamRecipe.builder()
+		.modelId(28078)
+		.animId(6974)
+		.primaryFinds(new short[]{70, 78})
+		.secondaryFinds(new short[]{99, 123})
+		.build()),
+
+	// Tumeken's Light, the sun keris spec (spotanim 2112) — the gold version of
+	// the generic spec glow, with a tick of overlap between passes.
+	// Single-colour model
+	SUN_KERIS("Sun keris spec", BeamRecipe.builder()
+		.modelId(2318)
+		.animId(1055)
+		.primaryFinds(new short[]{11218})
+		.ambientAdd(60)
+		.contrastAdd(60)
+		.loopOverlapMs(600)
+		.build()),
+
+	// Yama's basic shadow attack (spotanim 3244): swirls wind up around the
+	// tile then burst into claws. The half second of nothing between the two
+	// (frames 16-22) is skipped. Primary is the swirls, secondary the claws,
+	// the rubble stays grey
+	YAMA_SHADOW("Yama shadow", BeamRecipe.builder()
+		.modelId(14924)
+		.animId(12096)
+		.primaryFinds(new short[]{0})
+		.secondaryFinds(new short[]{-22380, -22374, -22370, -22363, -22233, -22050, -21950})
+		.ambientAdd(30)
+		.contrastAdd(100)
+		.loopOverlapMs(300)
+		.skipFromPercent(34)
+		.skipToPercent(52)
 		.build()),
 	;
 

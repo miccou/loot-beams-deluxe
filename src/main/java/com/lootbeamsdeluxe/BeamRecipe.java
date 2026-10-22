@@ -139,6 +139,12 @@ class BeamRecipe
 	@Builder.Default
 	int speedPercent = 100;
 
+	// frames that play unsmoothed when the Animation Smoothing plugin is on. Its
+	// tweening towards the next frame drags in parts the anim parks off-tile at
+	// zero size, when they should just snap into place
+	@Builder.Default
+	int[] snapFrames = {};
+
 	// render a second copy half an anim cycle behind, covering the dip when the loop restarts
 	@Builder.Default
 	boolean halfCycleOverlay = false;

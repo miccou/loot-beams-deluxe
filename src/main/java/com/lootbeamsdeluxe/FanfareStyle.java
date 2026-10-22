@@ -53,6 +53,7 @@ public enum FanfareStyle
 		.ambientAdd(50)
 		.contrastAdd(50)
 		.loop(false)
+		.snapFrames(new int[]{6})
 		.build()),
 
 	// Combat Achievements tier-reward teleport (spotanim 1950) — a celebratory
@@ -66,6 +67,7 @@ public enum FanfareStyle
 		.ambientAdd(30)
 		.contrastAdd(12)
 		.loop(false)
+		.snapFrames(new int[]{5})
 		.build()),
 
 	// Sins of the Father — Drakan incinerating the Myreque (spotanim 1813). A
@@ -91,6 +93,7 @@ public enum FanfareStyle
 		.ambientAdd(20)
 		.contrastAdd(20)
 		.loop(false)
+		.snapFrames(new int[]{0, 2, 4, 8, 10, 13, 14, 17})
 		.build()),
 
 	// Yama's phase two meteor (spotanim 3271). It's a projectile, but its own
@@ -124,6 +127,7 @@ public enum FanfareStyle
 		.contrastAdd(100)
 		.loop(false)
 		.endPercent(89)
+		.snapFrames(new int[]{22, 35, 38})
 		.build()),
 
 	// the cracks Yama's phase two shadow stomp spreads across the floor
@@ -158,6 +162,7 @@ public enum FanfareStyle
 		.secondaryFinds(new short[]{-22493, -22489})
 		.loop(false)
 		.endPercent(92)
+		.snapFrames(new int[]{14, 20, 24, 25, 26, 30, 32, 40, 42})
 		.build()),
 	;
 

@@ -84,6 +84,8 @@ public enum BeamStyle
 		.scaleX(64)
 		.scaleZ(64)
 		.startPercent(40)
+		.snapFrames(new int[]{15, 18, 20, 22, 23, 27, 28, 30, 31, 34, 36, 38, 39, 43, 44, 46,
+			47, 50, 52, 54, 55, 59, 60, 62, 63, 66, 68, 70, 71, 75, 76, 78})
 		.build()),
 
 	// long-looping mist (spotanim 2541) — the model comes translucent out of the cache
@@ -107,6 +109,7 @@ public enum BeamStyle
 		.ambientAdd(30)
 		.contrastAdd(30)
 		.halfCycleOverlay(true)
+		.snapFrames(new int[]{0})
 		.build()),
 
 	// Abyssal Sire miasma (spotanim 1275), a long 3.6s loop. The asset is
@@ -176,6 +179,7 @@ public enum BeamStyle
 		.startPercent(15)
 		.loopPercent(15)
 		.loopOverlapMs(600)
+		.snapFrames(new int[]{17, 23, 24, 26, 31, 37, 40, 47, 51, 55, 59, 63, 66, 72, 77, 78})
 		.build()),
 
 	// Kree'arra's whirlwind (spotanims 1199/1200 — ranged is the raw grey, magic
@@ -214,6 +218,7 @@ public enum BeamStyle
 		.loopOverlapMs(300)
 		.skipFromPercent(34)
 		.skipToPercent(52)
+		.snapFrames(new int[]{8, 11, 14, 15, 30, 32, 34, 35, 39})
 		.build()),
 	;
 

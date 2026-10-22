@@ -352,11 +352,7 @@ class DeluxeBeam
 
 	private AnimationController newAnimationController()
 	{
-		if (recipe.getSpeedPercent() == 100)
-		{
-			return new AnimationController(client, recipe.getAnimId());
-		}
-		return new SpedUpAnimationController(client, recipe.getAnimId(), recipe.getSpeedPercent());
+		return new RecipeAnimationController(client, recipe.getAnimId(), recipe.getSpeedPercent(), recipe.getSnapFrames());
 	}
 
 	// applies the recipe's resize to each frame after the anim has posed it
@@ -382,25 +378,54 @@ class DeluxeBeam
 		}
 	}
 
-	// the object ticks its controller with however many client ticks have
-	// passed, so scaling that count changes the playback speed
-	private static class SpedUpAnimationController extends AnimationController
+	private static class RecipeAnimationController extends AnimationController
 	{
+		private final Client client;
 		private final int speedPercent;
+		private final int[] snapFrames;
 		private int leftover;
 
-		SpedUpAnimationController(Client client, int animId, int speedPercent)
+		RecipeAnimationController(Client client, int animId, int speedPercent, int[] snapFrames)
 		{
 			super(client, animId);
+			this.client = client;
 			this.speedPercent = speedPercent;
+			this.snapFrames = snapFrames;
 		}
 
+		// the object ticks its controller with however many client ticks have
+		// passed, so scaling that count changes the playback speed
 		@Override
 		public void tick(int ticks)
 		{
 			int scaled = ticks * speedPercent + leftover;
 			leftover = scaled % 100;
 			super.tick(scaled / 100);
+		}
+
+		// the base controller flags the frame for tweening when Animation Smoothing
+		// allows it. Passing the bare frame number keeps snap frames untweened
+		@Override
+		public Model animate(Model model, AnimationController other)
+		{
+			Animation animation = getAnimation();
+			if (animation == null || !isSnapFrame(getFrame()))
+			{
+				return super.animate(model, other);
+			}
+			return client.applyTransformations(model, animation, getFrame(), null, 0);
+		}
+
+		private boolean isSnapFrame(int frame)
+		{
+			for (int snapFrame : snapFrames)
+			{
+				if (snapFrame == frame)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 

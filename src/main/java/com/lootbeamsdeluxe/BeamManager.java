@@ -142,13 +142,6 @@ class BeamManager
 		state.effect = new DeluxeBeam(client, clientThread, worldPoint,
 			fanfare.getStyle().getRecipe(), fanfare.getPrimary(), fanfare.getSecondary(),
 			() -> finishFanfare(worldPoint));
-
-		// Electric ramps up slowly and looks stalled if it only starts after the
-		// fanfare — let it ramp up underneath instead
-		if (state.resolution.getStyle() == BeamStyle.ELECTRIC)
-		{
-			spawnBeam(worldPoint, state.resolution);
-		}
 	}
 
 	private void finishFanfare(WorldPoint worldPoint)
@@ -160,18 +153,7 @@ class BeamManager
 		}
 
 		state.effect.remove();
-
-		DeluxeBeam existing = beams.get(worldPoint);
-		if (existing != null)
-		{
-			// spawned early during the fanfare — retarget in case the tile changed since
-			existing.setRecipe(state.resolution.getStyle().getRecipe());
-			existing.setColors(state.resolution.getPrimary(), state.resolution.getSecondary());
-		}
-		else
-		{
-			spawnBeam(worldPoint, state.resolution);
-		}
+		spawnBeam(worldPoint, state.resolution);
 	}
 
 	private void cancelFanfare(WorldPoint worldPoint)

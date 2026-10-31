@@ -54,6 +54,7 @@ Which items count also follows Ground Items' ownership setting, unless you set _
 | Kree'arra tornado  | Kree'arra's whirlwind attack                                                |
 | Sun keris spec     | the sun keris special attack                                                |
 | Yama shadow        | Yama's swirling shadow attack                                               |
+| Elemental fragment | breaking an elemental fragment from the Fractured Archive                   |
 
 ### Fanfares
 

@@ -47,6 +47,7 @@ public enum StyleOverride
 	KREE_TORNADO("Kree'arra tornado", BeamStyle.KREE_TORNADO),
 	SUN_KERIS("Sun keris spec", BeamStyle.SUN_KERIS),
 	YAMA_SHADOW("Yama shadow", BeamStyle.YAMA_SHADOW),
+	ELEMENTAL_FRAGMENT("Elemental fragment", BeamStyle.ELEMENTAL_FRAGMENT),
 	;
 
 	private final String displayName;

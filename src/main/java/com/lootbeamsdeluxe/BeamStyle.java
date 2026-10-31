@@ -220,6 +220,23 @@ public enum BeamStyle
 		.skipToPercent(52)
 		.snapFrames(new int[]{8, 11, 14, 15, 30, 32, 34, 35, 39})
 		.build()),
+
+	// breaking an elemental fragment from the Fractured Archive (spotanims
+	// 4418-4421, all recolours of the Trailblazer spawn, 2611). The flame shoots
+	// up and lifts off the tile, so the next pass starts as it lifts, and it's
+	// made 30% see-through. Flames take primary, the sparks and the bright
+	// streak up the middle secondary
+	ELEMENTAL_FRAGMENT("Elemental fragment", BeamRecipe.builder()
+		.modelId(50026)
+		.animId(10635)
+		.primaryFinds(new short[]{5072, 6096, 7128, 8152})
+		.secondaryFinds(new short[]{6094, 9164, 10200})
+		.transparencyAdd(77)
+		.ambientAdd(15)
+		.contrastAdd(100)
+		.loopOverlapMs(420)
+		.snapFrames(new int[]{3, 4, 10, 11, 12})
+		.build()),
 	;
 
 	private final String displayName;
